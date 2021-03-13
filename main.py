@@ -1,13 +1,18 @@
 
 from kivy.app import App
 from kivy.lang import Builder
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty
 from kivy.uix.image import Image
-import sqlite3,time
+import sqlite3,time,os
 from PIL import Image as pImage
 
 from pyzbar import pyzbar
+mypath=os.path.dirname(__file__)
+print('dirname:     ', mypath)
+
 # Create both screens. Please note the root.manager.current: this is how
 # you can control the ScreenManager from kv. Each screen has by default a
 # property manager that gives you the instance of the ScreenManager used.
@@ -202,7 +207,10 @@ Builder.load_string("""
             pos_hint:{'x':.9,'y':.9}
             on_press: root.manager.current = 'menu'
     BoxLayout:
-       
+        Button:
+            id:btn_popup
+            text: 'Popup'
+            on_press: root.popup_open(btn_popup)
         Button:
             text: 'Giris Sayfası'
             on_press: root.manager.current = 'login'
@@ -233,8 +241,12 @@ class LoginScreen(Screen):
             else:
                 print("kullanıcı girisi HATALI")
 class SettingsScreen(Screen):
-    pass
-
+    def popup_open(self,instance):
+        icerik=Label(text='Iste bir popup')
+        popup = Popup(title='Popup Pencere Baslıgı',content=icerik,size_hint=(None, None), size=(200, 200))
+        icerik.bind(on_touch_down=popup.dismiss)
+        popup.open()
+        
 class SearchScreen(Screen):
     def capture(self):
         '''
@@ -287,6 +299,8 @@ class TestApp(App):
 
     def build(self):
         # Create the screen manager
+        self.title='Stok Programı Mobile Uygulaması'
+        self.icon=mypath +'\\icons\\'+'warehouse4.png'
         self.sm = ScreenManager()
         self.sm.add_widget(MenuScreen(name='menu'))
         self.sm.add_widget(SettingsScreen(name='settings'))
